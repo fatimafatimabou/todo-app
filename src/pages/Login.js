@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -12,11 +12,12 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/todo");
     } catch (err) {
-      setError("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+      setError("البريد الإلكتروني أو كلمة المرور غير صحيحة.");
     }
   };
 
@@ -46,6 +47,12 @@ function Login() {
           </button>
           {error && <p style={styles.error}>{error}</p>}
         </form>
+        <p style={styles.switch}>
+          ليس لديك حساب؟{" "}
+          <Link to="/register" style={styles.link}>
+            إنشاء حساب جديد
+          </Link>
+        </p>
       </div>
     </div>
   );
@@ -56,7 +63,7 @@ export default Login;
 const styles = {
   page: {
     minHeight: "100vh",
-    backgroundColor: "#f0f4f8",
+    background: "linear-gradient(to bottom, #e3f2fd, #fce4ec)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -72,9 +79,9 @@ const styles = {
   },
   title: {
     textAlign: "center",
-    marginBottom: "30px",
-    fontSize: "1.8rem",
-    color: "#1e293b",
+    marginBottom: "25px",
+    fontSize: "1.9rem",
+    color: "#37474f",
     fontWeight: "700",
   },
   form: {
@@ -88,23 +95,35 @@ const styles = {
     border: "1.5px solid #cbd5e1",
     fontSize: "1rem",
     outline: "none",
-    transition: "border-color 0.3s",
   },
   button: {
     padding: "12px",
-    backgroundColor: "#10b981", // نفس لون زر التسجيل
+    backgroundColor: "#5d1049",
     color: "#ffffff",
     border: "none",
     borderRadius: "10px",
     fontWeight: "600",
     fontSize: "1rem",
     cursor: "pointer",
-    transition: "background-color 0.3s",
   },
   error: {
-    marginTop: "12px",
-    color: "#dc2626",
+    marginTop: "15px",
+    color: "#b71c1c",
     fontSize: "0.95rem",
     textAlign: "center",
+    backgroundColor: "#ffcdd2",
+    padding: "10px",
+    borderRadius: "8px",
+  },
+  switch: {
+    marginTop: "20px",
+    textAlign: "center",
+    fontSize: "0.95rem",
+    color: "#607d8b",
+  },
+  link: {
+    color: "#5d1049",
+    textDecoration: "none",
+    fontWeight: "600",
   },
 };

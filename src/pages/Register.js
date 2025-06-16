@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { auth } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -18,7 +18,6 @@ function Register() {
       navigate("/todo");
     } catch (err) {
       let message = "حدث خطأ أثناء التسجيل. حاول مرة أخرى.";
-
       if (err.code === "auth/email-already-in-use") {
         message = "البريد الإلكتروني مستخدم من قبل.";
       } else if (err.code === "auth/weak-password") {
@@ -26,7 +25,6 @@ function Register() {
       } else if (err.code === "auth/invalid-email") {
         message = "البريد الإلكتروني غير صالح.";
       }
-
       setError(message);
     }
   };
@@ -34,7 +32,7 @@ function Register() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h2 style={styles.title}>التسجيل</h2>
+        <h2 style={styles.title}>إنشاء حساب جديد</h2>
         <form style={styles.form} onSubmit={handleSubmit}>
           <input
             type="email"
@@ -53,10 +51,16 @@ function Register() {
             required
           />
           <button type="submit" style={styles.button}>
-            تسجيل
+            إنشاء حساب
           </button>
           {error && <p style={styles.error}>{error}</p>}
         </form>
+        <p style={styles.switch}>
+          لديك حساب؟{" "}
+          <Link to="/login" style={styles.link}>
+            تسجيل الدخول
+          </Link>
+        </p>
       </div>
     </div>
   );
@@ -67,7 +71,7 @@ export default Register;
 const styles = {
   page: {
     minHeight: "100vh",
-    backgroundColor: "#f0f4f8",
+    background: "linear-gradient(to bottom, #e3f2fd, #fce4ec)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -83,9 +87,9 @@ const styles = {
   },
   title: {
     textAlign: "center",
-    marginBottom: "30px",
-    fontSize: "1.8rem",
-    color: "#1e293b",
+    marginBottom: "25px",
+    fontSize: "1.9rem",
+    color: "#37474f",
     fontWeight: "700",
   },
   form: {
@@ -99,23 +103,35 @@ const styles = {
     border: "1.5px solid #cbd5e1",
     fontSize: "1rem",
     outline: "none",
-    transition: "border-color 0.3s",
   },
   button: {
     padding: "12px",
-    backgroundColor: "#10b981",
+    backgroundColor: "#5d1049",
     color: "#ffffff",
     border: "none",
     borderRadius: "10px",
     fontWeight: "600",
     fontSize: "1rem",
     cursor: "pointer",
-    transition: "background-color 0.3s",
   },
   error: {
-    marginTop: "12px",
-    color: "#dc2626",
+    marginTop: "15px",
+    color: "#b71c1c",
     fontSize: "0.95rem",
     textAlign: "center",
+    backgroundColor: "#ffcdd2",
+    padding: "10px",
+    borderRadius: "8px",
+  },
+  switch: {
+    marginTop: "20px",
+    textAlign: "center",
+    fontSize: "0.95rem",
+    color: "#607d8b",
+  },
+  link: {
+    color: "#5d1049",
+    textDecoration: "none",
+    fontWeight: "600",
   },
 };

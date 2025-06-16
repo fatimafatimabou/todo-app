@@ -15,7 +15,7 @@ const firebaseConfig = {
   measurementId: "G-W5MYXEBMFY",
 };
 
-// تهيئة Firebase
+// تهيئة Firebase 
 const app = initializeApp(firebaseConfig);
 
 // تهيئة Firestore

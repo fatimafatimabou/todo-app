@@ -17,257 +17,346 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
-const styles = {
-  container: {
-    maxWidth: "600px",
-    margin: "50px auto",
-    padding: "30px",
-    backgroundColor: "#f1f5f9",
-    borderRadius: "16px",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
-    fontFamily: "'Cairo', sans-serif",
-    position: "relative",
-  },
-  logoutButton: {
-    position: "absolute",
-    top: "20px",
-    left: "20px",
-    backgroundColor: "#e2e8f0",
-    color: "#1e293b",
-    padding: "8px 16px",
-    borderRadius: "8px",
-    border: "none",
-    cursor: "pointer",
-    fontWeight: "600",
-    transition: "background-color 0.3s",
-  },
-  logoutButtonHover: {
-    backgroundColor: "#cbd5e1",
-  },
-  title: {
-    textAlign: "center",
-    color: "#1e293b",
-    marginBottom: "30px",
-    fontSize: "2rem",
-    fontWeight: "700",
-  },
-  form: {
-    display: "flex",
-    gap: "10px",
-    marginBottom: "25px",
-  },
-  input: {
-    flexGrow: 1,
-    padding: "12px 16px",
-    borderRadius: "10px",
-    border: "2px solid #cbd5e1",
-    fontSize: "1rem",
-    outline: "none",
-  },
-  inputFocus: {
-    borderColor: "#3b82f6",
-  },
-  button: {
-    padding: "12px 20px",
-    backgroundColor: "#3b82f6",
-    color: "#fff",
-    fontWeight: "600",
-    border: "none",
-    borderRadius: "10px",
-    cursor: "pointer",
-    transition: "background-color 0.3s",
-  },
-  buttonHover: {
-    backgroundColor: "#2563eb",
-  },
-  list: {
-    listStyleType: "none",
-    padding: 0,
-  },
-  listItem: {
-    backgroundColor: "#ffffff",
-    padding: "14px 16px",
-    borderRadius: "10px",
-    marginBottom: "12px",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-  },
-  editInput: {
-    flexGrow: 1,
-    padding: "10px",
-    fontSize: "1rem",
-    borderRadius: "8px",
-    border: "1.5px solid #3b82f6",
-    outline: "none",
-  },
-  smallButton: (bgColor) => ({
-    backgroundColor: bgColor,
-    color: "white",
-    border: "none",
-    padding: "6px 12px",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontWeight: "600",
-    marginLeft: "10px",
-    transition: "background-color 0.3s",
-  }),
+const colors = {
+  background: "linear-gradient(to bottom, #e3f2fd, #fce4ec)",
+  card: "#ffffff",
+  blue: "#e0f7fa",
+  green: "#e8f5e9",
+  pink: "#fce4ec",
+  yellow: "#fff8e1",
+  title: "#37474f",
+  text: "#333",
+  subtitle: "#607d8b",
 };
 
 function ToDoList() {
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState("");
-  const [logoutHover, setLogoutHover] = useState(false);
-  const [inputFocused, setInputFocused] = useState(false);
-  const [hover, setHover] = useState(false);
+  const [deadline, setDeadline] = useState("");
+  const [category, setCategory] = useState("شخصي");
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
+  const [editDeadline, setEditDeadline] = useState("");
+  const [editType, setEditType] = useState("");
   const navigate = useNavigate();
 
+  const styles = {
+    container: {
+      minHeight: "100vh",
+      padding: "40px 20px",
+      background: colors.background,
+      color: colors.text,
+      fontFamily: "'Cairo', sans-serif",
+    },
+    innerContainer: {
+      maxWidth: "850px",
+      margin: "0 auto",
+    },
+    logoutButton: {
+      position: "absolute",
+      top: "20px",
+      left: "20px",
+      backgroundColor: colors.yellow,
+      color: colors.text,
+      padding: "8px 16px",
+      borderRadius: "10px",
+      border: "none",
+      cursor: "pointer",
+      fontWeight: "600",
+    },
+    title: {
+      textAlign: "center",
+      color: colors.title,
+      marginBottom: "30px",
+      fontSize: "2.5rem",
+      fontWeight: "700",
+    },
+    form: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "12px",
+      justifyContent: "center",
+      marginBottom: "30px",
+    },
+    input: {
+      padding: "12px 16px",
+      borderRadius: "10px",
+      border: "1.5px solid #ccc",
+      fontSize: "1rem",
+      minWidth: "180px",
+      backgroundColor: "#fff",
+    },
+    button: {
+      padding: "12px 20px",
+      backgroundColor: colors.pink,
+      color: colors.text,
+      fontWeight: "600",
+      border: "none",
+      borderRadius: "10px",
+      cursor: "pointer",
+    },
+    sectionTitle: {
+      fontSize: "1.5rem",
+      color: colors.subtitle,
+      margin: "30px 0 15px",
+      borderBottom: "2px solid #ccc",
+      display: "inline-block",
+    },
+    taskCard: {
+      backgroundColor: colors.card,
+      padding: "18px",
+      borderRadius: "14px",
+      marginBottom: "14px",
+      boxShadow: "0 6px 16px rgba(0,0,0,0.08)",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    smallButton: (bg) => ({
+      backgroundColor: bg,
+      color: "#000",
+      border: "none",
+      padding: "8px 14px",
+      borderRadius: "8px",
+      cursor: "pointer",
+      fontWeight: "600",
+      marginLeft: "6px",
+    }),
+  };
+
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
       if (!user) navigate("/login");
     });
 
     const q = query(collection(db, "todos"), orderBy("createdAt", "asc"));
-    const unsubscribeTodos = onSnapshot(q, (querySnapshot) => {
-      const items = [];
-      querySnapshot.forEach((doc) => {
-        items.push({ id: doc.id, ...doc.data() });
+    const unsubTodos = onSnapshot(q, (snapshot) => {
+      const data = [];
+      snapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() });
       });
-      setTodos(items);
+      setTodos(data);
     });
 
     return () => {
-      unsubscribeAuth();
-      unsubscribeTodos();
+      unsubAuth();
+      unsubTodos();
     };
   }, [navigate]);
 
+  useEffect(() => {
+    const now = new Date();
+    todos.forEach(todo => {
+      if (todo.deadline && !todo.completed) {
+        const taskDate = new Date(todo.deadline);
+        const sameDay = now.toDateString() === taskDate.toDateString();
+        if (sameDay) {
+          setTimeout(() => {
+            alert(`📌 تذكير: لديك مهمة اليوم - ${todo.text}`);
+          }, 1000);
+        }
+      }
+    });
+  }, [todos]);
+
+  function determineTaskType(deadline) {
+    if (!deadline) return "يومي";
+    const today = new Date();
+    const taskDate = new Date(deadline);
+
+    if (
+      taskDate.getFullYear() === today.getFullYear() &&
+      taskDate.getMonth() === today.getMonth() &&
+      taskDate.getDate() === today.getDate()
+    ) return "يومي";
+
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    if (taskDate >= startOfWeek && taskDate <= endOfWeek) return "أسبوعي";
+    if (taskDate.getFullYear() === today.getFullYear() && taskDate.getMonth() === today.getMonth()) return "شهري";
+
+    return "شهري";
+  }
+
   const addTodo = async (e) => {
     e.preventDefault();
-    if (input.trim() === "") return;
+    if (!input.trim()) return;
+    const autoType = determineTaskType(deadline);
     await addDoc(collection(db, "todos"), {
-      text: input.trim(),
+      text: input,
+      deadline,
+      category,
+      type: autoType,
       createdAt: serverTimestamp(),
+      completed: false,
     });
     setInput("");
+    setDeadline("");
+    setCategory("شخصي");
   };
 
   const deleteTodo = async (id) => {
     await deleteDoc(doc(db, "todos", id));
-    if (editingId === id) {
-      setEditingId(null);
-      setEditText("");
-    }
+  };
+
+  const toggleComplete = async (id, current) => {
+    await updateDoc(doc(db, "todos", id), { completed: !current });
   };
 
   const saveEdit = async (id) => {
-    if (editText.trim() === "") return;
-    await updateDoc(doc(db, "todos", id), { text: editText.trim() });
+    const autoType = determineTaskType(editDeadline);
+    await updateDoc(doc(db, "todos", id), {
+      text: editText,
+      deadline: editDeadline,
+      type: editType || autoType,
+    });
     setEditingId(null);
-    setEditText("");
   };
 
-  const logout = async () => {
-    await signOut(auth);
-    navigate("/login");
+  const groupedTodos = {
+    يومي: [],
+    أسبوعي: [],
+    شهري: [],
   };
+
+  todos.forEach((t) => {
+    if (groupedTodos[t.type]) groupedTodos[t.type].push(t);
+  });
 
   return (
     <div style={styles.container}>
-      <button
-        style={{
-          ...styles.logoutButton,
-          ...(logoutHover ? styles.logoutButtonHover : {}),
-        }}
-        onClick={logout}
-        onMouseEnter={() => setLogoutHover(true)}
-        onMouseLeave={() => setLogoutHover(false)}
-      >
-        تسجيل الخروج
-      </button>
-
-      <h2 style={styles.title}>قائمة المهام اليومية</h2>
-      <form style={styles.form} onSubmit={addTodo}>
-        <input
-          type="text"
-          placeholder="أضف مهمة جديدة..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          style={{
-            ...styles.input,
-            ...(inputFocused ? styles.inputFocus : {}),
-          }}
-          onFocus={() => setInputFocused(true)}
-          onBlur={() => setInputFocused(false)}
-        />
+      <div style={styles.innerContainer}>
         <button
-          type="submit"
-          style={{
-            ...styles.button,
-            ...(hover ? styles.buttonHover : {}),
+          style={styles.logoutButton}
+          onClick={() => {
+            signOut(auth);
+            navigate("/login");
           }}
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
         >
-          إضافة
+          تسجيل الخروج
         </button>
-      </form>
 
-      <ul style={styles.list}>
-        {todos.map((todo) => (
-          <li key={todo.id} style={styles.listItem}>
-            {editingId === todo.id ? (
-              <>
-                <input
-                  type="text"
-                  value={editText}
-                  onChange={(e) => setEditText(e.target.value)}
-                  style={styles.editInput}
-                />
-                <button
-                  onClick={() => saveEdit(todo.id)}
-                  style={styles.smallButton("#10b981")}
-                >
-                  حفظ
-                </button>
-                <button
-                  onClick={() => {
-                    setEditingId(null);
-                    setEditText("");
-                  }}
-                  style={styles.smallButton("#ef4444")}
-                >
-                  إلغاء
-                </button>
-              </>
-            ) : (
-              <>
-                <span>{todo.text}</span>
-                <div>
-                  <button
-                    onClick={() => {
-                      setEditingId(todo.id);
-                      setEditText(todo.text);
-                    }}
-                    style={styles.smallButton("#f59e0b")}
-                  >
-                    تعديل
-                  </button>
-                  <button
-                    onClick={() => deleteTodo(todo.id)}
-                    style={styles.smallButton("#dc2626")}
-                  >
-                    حذف
-                  </button>
-                </div>
-              </>
-            )}
-          </li>
+        <h1 style={styles.title}>📋 إدارة المهام</h1>
+
+        <form onSubmit={addTodo} style={styles.form}>
+          <input
+            type="text"
+            placeholder="مهمة جديدة"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            style={styles.input}
+          />
+          <input
+            type="date"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+            style={styles.input}
+          />
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            style={styles.input}
+          >
+            <option value="شخصي">شخصي</option>
+            <option value="عمل">عمل</option>
+            <option value="دراسة">دراسة</option>
+          </select>
+          <button type="submit" style={styles.button}>
+            ➕ إضافة
+          </button>
+        </form>
+
+        {["يومي", "أسبوعي", "شهري"].map((group) => (
+          <div key={group}>
+            <h2 style={styles.sectionTitle}>{group}</h2>
+            {groupedTodos[group].map((todo) => (
+              <div
+                key={todo.id}
+                style={{
+                  ...styles.taskCard,
+                  backgroundColor: todo.completed ? "#dcedc8" : "#fff",
+                  opacity: todo.completed ? 0.6 : 1,
+                  textDecoration: todo.completed ? "line-through" : "none",
+                }}
+              >
+                {editingId === todo.id ? (
+                  <>
+                    <input
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      style={styles.input}
+                    />
+                    <input
+                      type="date"
+                      value={editDeadline}
+                      onChange={(e) => setEditDeadline(e.target.value)}
+                      style={styles.input}
+                    />
+                    <select
+                      value={editType}
+                      onChange={(e) => setEditType(e.target.value)}
+                      style={styles.input}
+                    >
+                      <option value="يومي">يومي</option>
+                      <option value="أسبوعي">أسبوعي</option>
+                      <option value="شهري">شهري</option>
+                    </select>
+                    <button
+                      onClick={() => saveEdit(todo.id)}
+                      style={styles.smallButton(colors.green)}
+                    >
+                      حفظ
+                    </button>
+                    <button
+                      onClick={() => setEditingId(null)}
+                      style={styles.smallButton(colors.pink)}
+                    >
+                      إلغاء
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <strong>{todo.text}</strong>
+                      <div style={{ fontSize: "0.9rem", color: "#ccc" }}>
+                        📅 {todo.deadline || "بدون تاريخ"} | 📁 {todo.category} | 🔁 {todo.type}
+                      </div>
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => {
+                          setEditingId(todo.id);
+                          setEditText(todo.text);
+                          setEditDeadline(todo.deadline);
+                          setEditType(todo.type);
+                        }}
+                        style={styles.smallButton(colors.yellow)}
+                      >
+                        تعديل
+                      </button>
+                      <button
+                        onClick={() => deleteTodo(todo.id)}
+                        style={styles.smallButton("#ffcccb")}
+                      >
+                        حذف
+                      </button>
+                      <button
+                        onClick={() => toggleComplete(todo.id, todo.completed)}
+                        style={styles.smallButton(colors.blue)}
+                      >
+                        {todo.completed ? "✅ مكتمل" : "إنهاء"}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

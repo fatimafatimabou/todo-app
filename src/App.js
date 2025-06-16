@@ -1,9 +1,10 @@
+// src/App.js
+
 import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link,
   Navigate,
   useNavigate,
 } from "react-router-dom";
@@ -15,6 +16,8 @@ import ToDoList from "./pages/ToDoList";
 
 import { auth } from "./firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+
+import Navbar from "./components/Navbar"; // ✅ استيراد Navbar
 
 function PrivateRoute({ children }) {
   const [user, setUser] = useState(null);
@@ -57,26 +60,7 @@ function App() {
 
   return (
     <>
-      <nav style={styles.nav}>
-        <div style={styles.logo}>📌 مهامي</div>
-        <div style={styles.links}>
-          <Link to="/" style={styles.link}>🏠 الرئيسية</Link>
-          {!currentUser && (
-            <>
-              <Link to="/login" style={styles.link}>🔐 تسجيل الدخول</Link>
-              <Link to="/register" style={styles.link}>📝 إنشاء حساب</Link>
-            </>
-          )}
-          {currentUser && (
-            <>
-              <Link to="/todo" style={styles.link}>✅ قائمة المهام</Link>
-              <button onClick={handleLogout} style={styles.logoutButton}>
-                🚪 تسجيل الخروج
-              </button>
-            </>
-          )}
-        </div>
-      </nav>
+      <Navbar currentUser={currentUser} handleLogout={handleLogout} /> {/* ✅ تمرير props */}
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -103,45 +87,7 @@ export default function AppWrapper() {
   );
 }
 
-// التنسيقات
 const styles = {
-  nav: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#f4f4f4",
-    padding: "15px 30px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-    fontFamily: "'Segoe UI', sans-serif",
-  },
-  logo: {
-    fontSize: "1.5rem",
-    fontWeight: "bold",
-    color: "#333",
-  },
-  links: {
-    display: "flex",
-    gap: "20px",
-    alignItems: "center",
-  },
-  link: {
-    padding: "8px 16px",
-    borderRadius: "8px",
-    backgroundColor: "#e0e0e0",
-    color: "#333",
-    textDecoration: "none",
-    fontWeight: "500",
-    transition: "background-color 0.3s, color 0.3s",
-  },
-  logoutButton: {
-    padding: "8px 16px",
-    borderRadius: "8px",
-    backgroundColor: "#ef4444",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-    fontWeight: "500",
-  },
   loading: {
     textAlign: "center",
     padding: "40px",
