@@ -6,8 +6,7 @@ function Home() {
       <h1 style={styles.title}>👋 مرحبًا بك في تطبيق تنظيم المهام</h1>
       <p style={styles.subtitle}>
         نظّم يومك، راقب تقدمك، وحقق أهدافك بسهولة.
-      </p>VN S SDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDNVNVS SSSSSSSSSVSV NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN5S
-
+      </p>
       <div style={styles.features}>
         <div style={{ ...styles.card, backgroundColor: "#fef6e4" }}>
           <h3 style={styles.cardTitle}>✍️ خطط مهامك</h3>
